@@ -1,0 +1,28 @@
+
+version: 2
+
+models:
+  - name: users
+    description: "The raw user, loaded as a csv into a dbt seed."
+    columns:
+      - name: USER_ID
+        description: "A unique identifier for an inidvidual user, and the primary key for this table. This column is a 24-character string of alphanumeric characters. In the current set of data, the user_ids all follow the pattern of starting with 'qqqqq' and ending with '=='."
+        tests:
+          - unique
+          - not_null
+      - name: CREATED_AT
+        description: "The timestamp at which this user account was created - there is no time zone information provided in the data."
+      - name: IS_INTERNAL
+        description: "A boolean column indicating, presumably, if the user is internal or external to the organisation."
+      - name: SEGMENT
+        description: "A categorisation of the users into either personal or enterprise."
+
+  - name: pages_views
+    description: "The raw user, loaded as a csv into a dbt seed."
+    columns:
+      - name: NAME
+        description: "The name of the page where the view occured."
+      - name: RECEIVED_AT
+        description: "The timestamp at which this page view was received, presumably by the server. There does not appear to be any time zone information provided in the data."
+      - name: USER_ID
+        description: "The unique identifier for a user, which is a 36-character string of alphanumeric characters in what appears to be UUID format. In the current set of data, all non-null user_id values follow the pattern of starting with 'aaaaaaaa-', presumably some anonymisation technique or an artefact of the system generating these IDs. There are some null values in this field: about 1% of the records."
