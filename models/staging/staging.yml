@@ -6,7 +6,12 @@ models:
     description: "The staging model for raw page view data. This model performs some simple data cleansing and column renaming so that all downstream models use a consistently-formatted version of this data, and there is no need for repetition in multiple models."
     columns:
       - name: user_id
-        description: "A unique identifier for an inidvidual user, and the primary key for this table."
+        description: "A unique identifier for an inidvidual user, and the primary key for this table. This column is a 24-character string of alphanumeric characters. In the current set of data, the user_ids all follow the pattern of starting with 'qqqqq' and ending with '=='."
+        tests:
+          - unique
+          - not_null
+      - name: user_id_trimmed
+        description: "This column is a cleansed version of the user_id column, which removes a leading 'qqqqq' and a trailing '==', to leave just the string of characters that uniquely identifies the user_id."
         tests:
           - unique
           - not_null
@@ -36,5 +41,10 @@ models:
         description: "The timestamp at which this page view was received, presumably by the server, in the format of TIMESTAMP_NTZ(9) (or DATETIME). This is a date and time without timezone information. The range of dates is from 2022-10-28 to 2022-12-14."
         tests:
           - not_null
-      - name: user_id
-        description: "The unique identifier for a user, which is a foreign key in this table to the users data set."
+      - name: user_identifier
+        description: "The unique identifier for a user, which is a 36-character string of alphanumeric characters. In the current set of data, all non-null user_id values follow the pattern of starting with 'aaaaaaaa-'. There are some null values in this field: about 1% of the records."
+      - name: user_id_trimmed
+        description: "This column is a cleansed version of the user_id column, which removes the repeated leading pattern, to leave just the string of characters that uniquely identifies the user_id. Not that this column is not a foreign key to the users dataset, as the format used in the page views data differs from the user_id in the users dataset."
+        tests:
+          - unique
+          - not_null
