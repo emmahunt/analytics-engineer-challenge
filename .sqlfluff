@@ -1,0 +1,35 @@
+[sqlfluff]
+templater = dbt
+dialect = snowflake
+sql_file_exts = .sql
+
+# Exclude L018,L022,L024: To enable "importing" source dbt models as CTEs at the top of the file
+# Exclude L031: allow table aliases in from and join clauses - in fact this should be required
+# Exclude L043: allow verbose cases statements / with redundant else statements
+# Exclude L054: allow column groupings to be defined implicitly (e.g. group by 1, 2)
+exclude_rules = L018,L022,L024,L031,L043,L054 
+
+[sqlfluff:rules]
+max_line_length = 80
+indent_unit = space
+tab_space_size = 4
+capitalisation_policy = lower
+
+[sqlfluff:layout:type:comma]
+line_position = leading
+
+# Set the indentation rules
+[sqlfluff:indentation]
+indented_joins = False
+
+# Lines containing comments can be longer than 80 characters
+[sqlfluff:rules:layout.long_lines]
+ignore_comment_lines = True
+
+# Subqueries are not allowed
+[sqlfluff:rules:structure.subquery]
+forbid_subquery_in = both
+
+[sqlfluff:rules:capitalisation.identifiers]
+extended_capitalisation_policy = lower
+unquoted_identifiers_policy = all
