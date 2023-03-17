@@ -1,0 +1,40 @@
+
+version: 2
+
+models:
+  - name: stg_users
+    description: "The staging model for raw page view data. This model performs some simple data cleansing and column renaming so that all downstream models use a consistently-formatted version of this data, and there is no need for repetition in multiple models."
+    columns:
+      - name: user_id
+        description: "A unique identifier for an inidvidual user, and the primary key for this table."
+        tests:
+          - unique
+          - not_null
+      - name: created_at
+        description: "The timestamp at which this user account was created, in the format TIMESTAMP_NTZ(9) (or DATETIME). This is a date and time without timezone information. The range of dates in this column is from 2021-10-21 until 2023-01-26, with some null values present."
+      - name: is_internal
+        description: "A boolean column indicating, presumably, if the user is internal or external to the organisation."
+        tests:
+          - not_null
+      - name: segment
+        description: "A categorisation of the users into either personal or enterprise. The majority of users (>90%) are in the 'personal' segment. The column is formatted in all caps."
+        tests:
+          - not_null
+
+          # This test ensures that if there is a new type of segment, we will be alerted via a "noisy" failure of this test
+          - accepted_values:
+              values: ["PERSONAL", "ENTERPRISE"]
+              
+  - name: stg_page_views
+    description: "The staging model for raw page view data. This model performs some simple data cleansing and column renaming so that all downstream models use a consistently-formatted version of this data, and there is no need for repetition in multiple models."
+    columns:
+      - name: page_path
+        description: "The url path of the page that was viewed, not including the domain, protocol, top level domain or any query parameters. This column is a string of alphanumeric characters always starting with a backslash, without any special characters. e.g. '/video'"
+        tests:
+          - not_null
+      - name: received_at
+        description: "The timestamp at which this page view was received, presumably by the server, in the format of TIMESTAMP_NTZ(9) (or DATETIME). This is a date and time without timezone information. The range of dates is from 2022-10-28 to 2022-12-14."
+        tests:
+          - not_null
+      - name: user_id
+        description: "The unique identifier for a user, which is a foreign key in this table to the users data set."
