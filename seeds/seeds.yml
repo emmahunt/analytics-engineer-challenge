@@ -25,4 +25,4 @@ models:
       - name: RECEIVED_AT
         description: "The timestamp at which this page view was received, presumably by the server. There does not appear to be any time zone information provided in the data."
       - name: USER_ID
-        description: "The unique identifier for a user, which is a 36-character string of alphanumeric characters. In the current set of data, all non-null user_id values follow the pattern of starting with 'aaaaaaaa-'. There are some null values in this field: about 1% of the records."
+        description: "The unique identifier for a user, which is a 36-character string of alphanumeric characters in what appears to be UUID format. In the current set of data, all non-null user_id values follow the pattern of starting with 'aaaaaaaa-', presumably some anonymisation technique or an artefact of the system generating these IDs. There are some null values in this field: about 1% of the records."
