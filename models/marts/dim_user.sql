@@ -10,8 +10,8 @@ with stg_users as (select * from {{ ref('stg_users') }})
         , stg_users.segment
         , mapping_table.user_identifier
     from stg_users
-        left join mapping_table
-            on stg_users.user_id = mapping_table.user_id
+    left join mapping_table
+        on stg_users.user_id = mapping_table.user_id
 )
 
 select * from final

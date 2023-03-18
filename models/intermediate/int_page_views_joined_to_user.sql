@@ -15,7 +15,11 @@ with page_views as (select * from {{ ref('stg_page_views') }})
 
     -- There are 2 users who have multiple first time visit events
     -- Limit to just the latest / most recent sign up event for each user
-    qualify row_number() over (partition by user_identifier order by received_at desc) = 1  
+    qualify
+        row_number() over (
+            partition by user_identifier 
+            order by received_at desc
+        ) = 1  
 )
 
 , final as (
@@ -26,7 +30,10 @@ with page_views as (select * from {{ ref('stg_page_views') }})
     left join users
 
         -- Join based on the timestamp - in the majority of cases, the user record being created will be within 10 seconds of the sign up page view event
-        on timestampdiff(second, users.created_at::timestamp, supv.received_at::timestamp) between 0 and 5
+        on
+            timestampdiff(
+                second, users.created_at::timestamp, supv.received_at::timestamp
+            ) between 0 and 5
     where users.user_id is not null
     group by 1, 2
 )
