@@ -4,7 +4,8 @@ with stg_page_views as (select * from {{ ref('stg_page_views') }})
 -- Join to the user-identifier mapping table to derive the user_id: a foreign key to the user dimension in this table
 , final as (
     select
-        stg_page_views.page_path
+        {{ dbt_utils.generate_surrogate_key( ['stg_page_views.user_identifier', 'stg_page_views.page_path', 'stg_page_views.received_at']) }} as page_view_id
+        , stg_page_views.page_path
         , stg_page_views.received_at
 
         -- This column could be excluded for true "normalisation" of the fact table

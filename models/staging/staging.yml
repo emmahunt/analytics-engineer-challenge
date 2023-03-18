@@ -27,6 +27,12 @@ models:
               
   - name: stg_page_views
     description: "The staging model for raw page view data. This model performs some simple data cleansing and column renaming so that all downstream models use a consistently-formatted version of this data, and there is no need for repetition in multiple models."
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - received_at
+            - user_identifier
+            - page_path
     columns:
       - name: page_path
         description: "The url path of the page that was viewed, not including the domain, protocol, top level domain or any query parameters. This column is a string of alphanumeric characters always starting with a backslash, without any special characters. e.g. '/video'"

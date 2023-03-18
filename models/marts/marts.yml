@@ -30,6 +30,11 @@ models:
   - name: fact_page_view
     description: "The transactional fact table containing one row per page view event - an instance of a user accessing a page on the website."
     columns:
+      - name: page_view_id
+        description: "The primary key for this table, which uniquely identifies a page view event. This is a hashed surrogate key over a combination of the page_path, user_identifier and received_at columns. It seems that there are some cases where the same user can access 2 different pages at the exact same time, so the path is required as part of this unique key."
+        tests:
+          - unique
+          - not_null
       - name: page_path
         description: "The url path of the page that was viewed, not including the domain, protocol, top level domain or any query parameters. This column is a string of alphanumeric characters always starting with a backslash, without any special characters. e.g. '/video'"
         tests:
