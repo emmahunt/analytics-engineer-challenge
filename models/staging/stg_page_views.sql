@@ -8,7 +8,7 @@ with raw_data as (
     select
         name as page_path
         , received_at
-        , user_id
+        , user_id as user_identifier
     from raw_data
 )
 

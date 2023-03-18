@@ -1,0 +1,16 @@
+
+version: 2
+
+models:
+  - name: int_page_views_joined_to_user
+    description: "This intermediate model performs some logic to join the page view table to the users table. This is required because the user id in the page view table does not join directly to the users table, so the link between the pageview user identifier and the user table user_id must be inferred by the timestamp of a corresponding page view in the page views table.\n 
+    
+    The '/first-time-visit' page view is used as a proxy event for a user being created. This is based on an assumed workflow in the sign up process: / -> /pricing -> /missing-subscription -> /first-time-visit -> /questionaire -> ... (assumed based on the sequence of page views for individual users). This was also informed by the number of expected user sign ups in the date range of the page views provided (~6,000) to the number of users on each page path in the page views table for the same date range. The /first-time-visit page with ~4,000 unique user identifier page views in the page view table is the closest match based on the number of records. A very promising sounding page name such as '/signup/completed' as a proxy for user sign up has only ~150 corresponding unique idenfitiers, so can't be used to match the page views to the users table."
+    columns:
+      - name: user_identifier
+        description: "The unique identifier for a user as found in the page views table. This identifier is a 36-character string of alphanumeric characters of UUID / GUID format."
+        tests:
+          - unique
+          - not_null
+      - name: user_id
+        description: "The user_id from the users table that corresponds to the user_identifier from the page view data set. This correlation has been inferred by the timestamp of a 'first time visit' page view in the page views table, so is not a certain match, but rather a best guess."
