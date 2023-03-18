@@ -13,12 +13,12 @@ with page_views as (select * from {{ ref('stg_page_views') }})
     -- This is based on the understanding that a successful user sign up flow is indicated by a land on the /first-time-visit page
     where page_path = '/first-time-visit'
 
-    -- There are 2 users who have multiple first time visit events
-    -- Limit to just the latest / most recent sign up event for each user
+    -- There are many instances of users who have multiple first time visit events
+    -- Limit to the earliest in these cases
     qualify
         row_number() over (
             partition by user_identifier 
-            order by received_at desc
+            order by received_at asc
         ) = 1  
 )
 
@@ -29,7 +29,7 @@ with page_views as (select * from {{ ref('stg_page_views') }})
     from sign_up_page_views as supv
     left join users
 
-        -- Join based on the timestamp - in the majority of cases, the user record being created will be within 10 seconds of the sign up page view event
+        -- Join based on the timestamp - allow for a delay of 5 seconds between the two sources
         on
             timestampdiff(
                 second, users.created_at::timestamp, supv.received_at::timestamp
