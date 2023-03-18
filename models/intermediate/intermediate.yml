@@ -14,3 +14,5 @@ models:
           - not_null
       - name: user_id
         description: "The user_id from the users table that corresponds to the user_identifier from the page view data set. This correlation has been inferred by the timestamp of a 'first time visit' page view in the page views table, so is not a certain match, but rather a best guess."
+        tests:
+          - unique
