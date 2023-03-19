@@ -75,7 +75,7 @@ models:
         description: "The url path of the page that was viewed, not including the domain, protocol, top level domain or any query parameters. This column is a string of alphanumeric characters always starting with a backslash, without any special characters. e.g. '/video'"
         tests:
           - not_null
-      - name: url
+      - name: url_raw
         description: "The full web url of the web page."
       - name: page_category
         description: "A broad grouping of the types of web pages, used for categorising the type of activity a user might be doing on that page."
