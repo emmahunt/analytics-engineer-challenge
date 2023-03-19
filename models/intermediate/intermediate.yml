@@ -5,7 +5,7 @@ models:
   - name: int_page_views_joined_to_user
     description: "This intermediate model performs some logic to join the page view table to the users table. This is required because the user id in the page view table does not join directly to the users table, so the link between the pageview user identifier and the user table user_id must be inferred by the timestamp of a corresponding page view in the page views table.\n 
     
-    The '/first-time-visit' page view is used as a proxy event for a user being created. This is based on an assumed workflow in the sign up process: / -> /pricing -> /missing-subscription -> /first-time-visit -> /questionaire -> ... (assumed based on the sequence of page views for individual users). This was also informed by the number of expected user sign ups in the date range of the page views provided (~6,000) to the number of users on each page path in the page views table for the same date range. The /first-time-visit page with ~4,000 unique user identifier page views in the page view table is the closest match based on the number of records. A very promising sounding page name such as '/signup/completed' as a proxy for user sign up has only ~150 corresponding unique idenfitiers, so can't be used to match the page views to the users table."
+    There are a few page views that used as a proxy event for a user being created: any that are categorised in the dim_web_page dimension as being associated with account creation. This is based on an assumption that there are many different landing pages that will trigger a user account being created in the 'backend' user system. When using just a single account page (e.g. '/first-time-visit') as a proxy event for a user account being created, the match rate between page views and users was too low to be useful. So, many different page views are assessed and a match is attempted to the user system based on the timestamp of these events."
     columns:
       - name: user_identifier
         description: "The unique identifier for a user as found in the page views table. This identifier is a 36-character string of alphanumeric characters of UUID / GUID format."
@@ -13,6 +13,23 @@ models:
           - unique
           - not_null
       - name: user_id
-        description: "The user_id from the users table that corresponds to the user_identifier from the page view data set. This correlation has been inferred by the timestamp of a 'first time visit' page view in the page views table, so is not a certain match, but rather a best guess."
+        description: "The user_id from the users table that corresponds to the user_identifier from the page view data set, according to a best attempt at matching based on the timestamp of a page view associated with account creation, and the created_at data in the users table. It is not a certain match, but rather a best guess."
         tests:
           - unique
+    
+  - name: int_lapsed_users
+    description: "This intermediate model determines which users in the page view data are currently lapsed, defined as a period of 7 days without a page view, when there has been at least one page view from that user in the past. This model is currently just relative to the latest page view, so supresses instances where a user may have lapsed in the past, if they have since returned to the site."
+    columns:
+      - name: user_identifier
+        description: "The unique identifier for a user as found in the page views table. This identifier is a 36-character string of alphanumeric characters of UUID / GUID format."
+        tests:
+          - unique
+          - not_null
+      - name: latest_page_view
+        description: "The maximum date for a page view in the data set."
+      - name: lapsed_date
+        description: "The latest date the a user lapsed, if they are currently lapsed. This column will be null if the user is not currently lapsed. This is calculated by projecting the latest page view date 7 days forward, and assessing if that date has passed (in this context, relative to the maximum date we have data for which is 2022-12-14. In a real world scenario, the current date or contextual date for the job run should be used).\n\n
+        
+        The date of the lapse will be the last day the user accessed the site, NOT the 7 day projection beyond their last day of use."
+      - name: is_active
+        description: "A boolean column indicating if the user is currently active (1) or not (0). The definition of an active customer is one that is not currently lapsed."

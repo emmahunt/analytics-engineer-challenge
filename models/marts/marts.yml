@@ -24,6 +24,12 @@ models:
           # This test ensures that if there is a new type of segment, we will be alerted via a "noisy" failure of this test
           - accepted_values:
               values: ["PERSONAL", "ENTERPRISE"]
+      - name: user_cohort_week
+        description: "The week in which the user was created, used for cohort analysis of user retention."
+      - name: is_active
+        description: "A boolean column flagging if the user is currently active."
+      - name: lapsed_date
+        description: "The date that the user most recently lapsed, if they are currently lapsed. This column will be null if the user is not currently lapsed."
       - name: user_identifier
         description: "The UUID formatted unique identifier for a user, which is used in the page view data set. This is an inferred match to the user_id based on a timestamp of the user creation and corresponding page view event. It can be used to join the users data set to the page view data set."
               
