@@ -15,18 +15,18 @@ metrics:
 
     dimensions:
       - user_cohort_week
-  
-  - name: active_users
-    label: Active Users
-    model: ref('fact_page_view')
-    description: "A user is considered active if they have generated a page view in the given time grain."
+
+  - name: lapsed_users
+    label: Lapsed Users
+    model: ref('dim_user')
+    description: "A user is considered lapsed if they have not generated a page view in 7 days."
 
     calculation_method: count_distinct
-    expression: user_identifier 
+    expression: user_identifier
 
-    timestamp: received_at
+    timestamp: lapsed_date
     time_grains: [day, week, month, quarter, year]
 
     dimensions:
       - user_identifier
-
+      - user_cohort_week
