@@ -6,7 +6,7 @@ with raw_data as (
 -- Change column names
 , final as (
     select
-        name as page_path
+        name as path
         , received_at
         , user_id as user_identifier
     from raw_data

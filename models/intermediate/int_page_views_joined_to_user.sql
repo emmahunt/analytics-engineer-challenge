@@ -11,7 +11,7 @@ with page_views as (select * from {{ ref('stg_page_views') }})
 
     -- Limit to just page views on the first-time-visit page as a proxy for a user account being created 
     -- This is based on the understanding that a successful user sign up flow is indicated by a land on the /first-time-visit page
-    where page_path = '/first-time-visit'
+    where path = '/first-time-visit'
 
     -- There are many instances of users who have multiple first time visit events
     -- Limit to the earliest in these cases
