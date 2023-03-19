@@ -1,0 +1,32 @@
+
+version: 2
+
+metrics:
+  - name: new_users
+    label: New Users
+    model: ref('dim_user')
+    description: "The count of new users - people or organisations who have created an account and submitted payment details for the product."
+
+    calculation_method: count_distinct
+    expression: user_id 
+
+    timestamp: created_at
+    time_grains: [day, week, month, quarter, year]
+
+    dimensions:
+      - user_cohort_week
+  
+  - name: active_users
+    label: Active Users
+    model: ref('fact_page_view')
+    description: "A user is considered active if they have generated a page view in the given time grain."
+
+    calculation_method: count_distinct
+    expression: user_identifier 
+
+    timestamp: received_at
+    time_grains: [day, week, month, quarter, year]
+
+    dimensions:
+      - user_identifier
+
