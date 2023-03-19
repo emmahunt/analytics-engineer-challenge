@@ -33,17 +33,29 @@ with dim_user as (select * from {{ ref('dim_user') }})
     select 
         date_spine.date_week
         , dim_user.user_cohort_week
-        , count_if(dim_user.user_cohort_week = date_spine.date_week) as new_users
+        , count_if(
+            dim_user.user_cohort_week = date_spine.date_week
+        ) as new_users
         , sum(lapsed_users.lapsed_user_count) as lapsed_users
-        , count_if(active_users.number_of_page_views is not null) as active_users
+        , count_if(
+            active_users.number_of_page_views is not null
+        ) as active_users
     from date_spine
     cross join dim_user
     left join lapsed_users
-        on date_trunc(week, lapsed_users.lapsed_date)::date = date_spine.date_week
-        and dim_user.user_id = lapsed_users.user_id
+        on
+            cast(date_trunc(
+                week
+                , lapsed_users.lapsed_date
+            ) as date) = date_spine.date_week
+            and dim_user.user_id = lapsed_users.user_id
     left join active_users
-        on date_spine.date_week = date_trunc(week, active_users.received_at)::date
-        and dim_user.user_identifier = active_users.user_identifier
+        on
+            cast(date_trunc(
+                week
+                , active_users.received_at
+            ) as date) = date_spine.date_week
+            and dim_user.user_identifier = active_users.user_identifier
     group by 1, 2
 )
 

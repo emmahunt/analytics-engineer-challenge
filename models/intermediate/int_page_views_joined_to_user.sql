@@ -22,13 +22,16 @@ with page_views as (select * from {{ ref('stg_page_views') }})
         supv.user_identifier
         , users.user_id
     from users
-    left join sign_up_page_views as supv
+    left join
+        sign_up_page_views as supv
 
         -- The only way to attempt to match users in the two systems is by the timestamp: in this case, allow for 65 seconds between the web page event and the user creation in the back end system
         -- This is likely an overly generous time window, but even so only 40% of the users can be matched
         on
             timestampdiff(
-                second, supv.received_at::timestamp, users.created_at::timestamp
+                second
+                , supv.received_at::timestamp
+                , users.created_at::timestamp
             ) between -5 and 60
     where supv.user_identifier is not null
     group by 1, 2
