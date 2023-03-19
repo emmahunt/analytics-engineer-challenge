@@ -4,8 +4,8 @@ with stg_page_views as (select * from {{ ref('stg_page_views') }})
 -- Join to the user-identifier mapping table to derive the user_id: a foreign key to the user dimension in this table
 , mapping_table_join as (
     select
-        {{ dbt_utils.generate_surrogate_key( ['stg_page_views.user_identifier', 'stg_page_views.page_path', 'stg_page_views.received_at']) }} as page_view_id
-        , stg_page_views.page_path
+        {{ dbt_utils.generate_surrogate_key( ['stg_page_views.user_identifier', 'stg_page_views.path', 'stg_page_views.received_at']) }} as page_view_id
+        , stg_page_views.path
         , stg_page_views.received_at
         , stg_page_views.user_identifier
         
@@ -25,7 +25,7 @@ with stg_page_views as (select * from {{ ref('stg_page_views') }})
 , calculate_session_id as (
     select
         page_view_id
-        , page_path
+        , path
         , received_at
         , user_identifier
         , next_page_view_at
@@ -52,7 +52,7 @@ with stg_page_views as (select * from {{ ref('stg_page_views') }})
 , final as (
     select 
         page_view_id
-        , page_path
+        , path
         , received_at
 
         -- This column could be excluded for true "normalisation" of the fact table
@@ -73,6 +73,7 @@ with stg_page_views as (select * from {{ ref('stg_page_views') }})
         end as dwell_time_in_seconds
 
         -- Foreign keys at end of table
+        , path as web_page_id
         , user_id
         , {{ dbt_utils.generate_surrogate_key(['user_identifier', 'new_session_increment']) }} as session_id
     from calculate_session_id

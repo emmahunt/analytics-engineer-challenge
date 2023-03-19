@@ -31,14 +31,17 @@ models:
     description: "The transactional fact table containing one row per page view event - an instance of a user accessing a page on the website."
     columns:
       - name: page_view_id
-        description: "The primary key for this table, which uniquely identifies a page view event. This is a hashed surrogate key over a combination of the page_path, user_identifier and received_at columns. It seems that there are some cases where the same user can access 2 different pages at the exact same time, so the path is required as part of this unique key."
+        description: "The primary key for this table, which uniquely identifies a page view event. This is a hashed surrogate key over a combination of the path, user_identifier and received_at columns. It seems that there are some cases where the same user can access 2 different pages at the exact same time, so the path is required as part of this unique key."
         tests:
           - unique
           - not_null
-      - name: page_path
+      - name: path
         description: "The url path of the page that was viewed, not including the domain, protocol, top level domain or any query parameters. This column is a string of alphanumeric characters always starting with a backslash, without any special characters. e.g. '/video'"
         tests:
           - not_null
+          - dbt_utils.relationships_where:
+              to: ref('dim_web_page')
+              field: path
       - name: received_at
         description: "The timestamp at which this page view was received, presumably by the server, in the format of TIMESTAMP_NTZ(9) (or DATETIME)."
         tests:
@@ -59,3 +62,22 @@ models:
         description: "A surrogate key that uniquely identifies a browsing session of a single user."
         tests:
           - not_null
+
+  - name: dim_web_page
+    description: "The user dimension table, which contains descriptive attributes we know about a web page."
+    columns:
+      - name: web_page_id
+        description: "A unique identifier for an inidvidual web page, and the primary key for this table. This is a natural key, as the page is already uniquely defined by the path."
+        tests:
+          - unique
+          - not_null
+      - name: path
+        description: "The url path of the page that was viewed, not including the domain, protocol, top level domain or any query parameters. This column is a string of alphanumeric characters always starting with a backslash, without any special characters. e.g. '/video'"
+        tests:
+          - not_null
+      - name: url
+        description: "The full web url of the web page."
+      - name: page_category
+        description: "A broad grouping of the types of web pages, used for categorising the type of activity a user might be doing on that page."
+      - name: "sign_up_process_ordinal"
+        description: "A column used for sorting the sign up process pages in the correct order. There a jumps of 10 in the ordering in case new pages are added to the sign up process in the future."

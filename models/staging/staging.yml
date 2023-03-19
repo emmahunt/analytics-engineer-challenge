@@ -32,9 +32,9 @@ models:
           combination_of_columns:
             - received_at
             - user_identifier
-            - page_path
+            - path
     columns:
-      - name: page_path
+      - name: path
         description: "The url path of the page that was viewed, not including the domain, protocol, top level domain or any query parameters. This column is a string of alphanumeric characters always starting with a backslash, without any special characters. e.g. '/video'"
         tests:
           - not_null
