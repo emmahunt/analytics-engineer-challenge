@@ -5,8 +5,8 @@ with dim_user as (select * from {{ ref('dim_user') }})
 , date_spine as (
     {{ dbt_utils.date_spine(
         datepart="week",
-        start_date="cast('2022-10-08' as date)",
-        end_date="cast('2022-12-14' as date)"
+        start_date="cast('2022-10-24' as date)",
+        end_date="cast('2022-12-19' as date)"
     )
     }}
 )
