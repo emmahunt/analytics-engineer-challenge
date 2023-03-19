@@ -81,3 +81,19 @@ models:
         description: "A broad grouping of the types of web pages, used for categorising the type of activity a user might be doing on that page."
       - name: "sign_up_process_ordinal"
         description: "A column used for sorting the sign up process pages in the correct order. There a jumps of 10 in the ordering in case new pages are added to the sign up process in the future."
+  
+metrics:
+  - name: new_users
+    label: New Users
+    model: ref('dim_user')
+    description: "The count of new users - people or organisations who have created an account and submitted payment details for the product."
+
+    calculation_method: count_distinct
+    expression: user_id 
+
+    timestamp: created_at
+    time_grains: [day, week, month, quarter, year]
+
+    dimensions:
+      - user_cohort_week
+
