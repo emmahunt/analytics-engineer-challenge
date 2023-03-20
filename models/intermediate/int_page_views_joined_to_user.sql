@@ -1,41 +1,52 @@
 with page_views as (select * from {{ ref('stg_page_views') }})
 , users as (select * from {{ ref('stg_users') }})
+, dim_web_page as (select * from {{ ref('dim_web_page') }})
 
 -- Identify the sign up events on the page view side
 -- so we can link the page view sign up event to the corresponding row in the users table
 , sign_up_page_views as (
     select 
-        user_identifier
-        , received_at
+        page_views.user_identifier
+        , page_views.received_at
     from page_views
+    left join dim_web_page
+        on page_views.path = dim_web_page.path
 
-    -- Limit to just page views on the first-time-visit page as a proxy for a user account being created 
-    -- This is based on the understanding that a successful user sign up flow is indicated by a land on the /first-time-visit page
-    where path = '/first-time-visit'
-
-    -- There are many instances of users who have multiple first time visit events
-    -- Limit to the earliest in these cases
-    qualify
-        row_number() over (
-            partition by user_identifier 
-            order by received_at asc
-        ) = 1  
+    -- Limit to just page views on a set of paths related to account creation as a proxy for a user account being created 
+    -- This is based on the understanding that a user account will be created in the "back end" / user management system shortly after a front end event on a set of pages related to account creation
+    where dim_web_page.page_category = 'account management'
 )
 
 , final as (
     select 
         supv.user_identifier
         , users.user_id
-    from sign_up_page_views as supv
-    left join users
+    from users
+    left join
+        sign_up_page_views as supv
 
-        -- Join based on the timestamp - allow for a delay of 5 seconds between the two sources
+        -- The only way to attempt to match users in the two systems is by the timestamp: in this case, allow for 65 seconds between the web page event and the user creation in the back end system
+        -- This is likely an overly generous time window, but even so only 40% of the users can be matched
         on
             timestampdiff(
-                second, users.created_at::timestamp, supv.received_at::timestamp
-            ) between 0 and 5
-    where users.user_id is not null
+                second
+                , supv.received_at::timestamp
+                , users.created_at::timestamp
+            ) between -5 and 60
+    where supv.user_identifier is not null
     group by 1, 2
+    
+    -- Deduplicate the matches so that the relationship between user_id and user_identifier is 1:1
+    qualify
+        row_number() over (
+            partition by users.user_id
+            order by supv.user_identifier asc
+        ) = 1  
+        and 
+        row_number() over (
+            partition by supv.user_identifier
+            order by users.user_id asc
+        ) = 1  
 )
 
 select * from final

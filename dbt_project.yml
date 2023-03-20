@@ -43,6 +43,9 @@ models:
     marts:
       +materialized: table
       +schema: marts
+    metrics:
+      +materialized: table
+      +schema: metrics
 seeds:
   synthesia_challenge:
     +schema: raw

@@ -24,6 +24,12 @@ models:
           # This test ensures that if there is a new type of segment, we will be alerted via a "noisy" failure of this test
           - accepted_values:
               values: ["PERSONAL", "ENTERPRISE"]
+      - name: user_cohort_week
+        description: "The week in which the user was created, used for cohort analysis of user retention."
+      - name: is_active
+        description: "A boolean column flagging if the user is currently active."
+      - name: lapsed_date
+        description: "The date that the user most recently lapsed, if they are currently lapsed. This column will be null if the user is not currently lapsed."
       - name: user_identifier
         description: "The UUID formatted unique identifier for a user, which is used in the page view data set. This is an inferred match to the user_id based on a timestamp of the user creation and corresponding page view event. It can be used to join the users data set to the page view data set."
               
@@ -75,7 +81,7 @@ models:
         description: "The url path of the page that was viewed, not including the domain, protocol, top level domain or any query parameters. This column is a string of alphanumeric characters always starting with a backslash, without any special characters. e.g. '/video'"
         tests:
           - not_null
-      - name: url
+      - name: url_raw
         description: "The full web url of the web page."
       - name: page_category
         description: "A broad grouping of the types of web pages, used for categorising the type of activity a user might be doing on that page."

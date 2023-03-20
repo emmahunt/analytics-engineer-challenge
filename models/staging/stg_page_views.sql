@@ -12,10 +12,11 @@ with raw_data as (
     from raw_data
 
     -- Remove true duplicate page views: the pages at the same exact time, by the same user on the same page
-    qualify row_number() over (
-        partition by user_id, name, received_at
-        order by received_at asc
-    ) = 1
+    qualify
+        row_number() over (
+            partition by user_id, name, received_at
+            order by received_at asc
+        ) = 1
 
 )
 
