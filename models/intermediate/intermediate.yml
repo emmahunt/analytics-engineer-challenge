@@ -17,19 +17,3 @@ models:
         tests:
           - unique
     
-  - name: int_lapsed_users
-    description: "This intermediate model determines which users in the page view data are currently lapsed, defined as a period of 7 days without a page view, when there has been at least one page view from that user in the past. This model is currently just relative to the latest page view, so supresses instances where a user may have lapsed in the past, if they have since returned to the site."
-    columns:
-      - name: user_identifier
-        description: "The unique identifier for a user as found in the page views table. This identifier is a 36-character string of alphanumeric characters of UUID / GUID format."
-        tests:
-          - unique
-          - not_null
-      - name: latest_page_view
-        description: "The maximum date for a page view in the data set."
-      - name: lapsed_date
-        description: "The latest date the a user lapsed, if they are currently lapsed. This column will be null if the user is not currently lapsed. This is calculated by projecting the latest page view date 7 days forward, and assessing if that date has passed (in this context, relative to the maximum date we have data for which is 2022-12-14. In a real world scenario, the current date or contextual date for the job run should be used).\n\n
-        
-        The date of the lapse will be the last day the user accessed the site, NOT the 7 day projection beyond their last day of use."
-      - name: is_active
-        description: "A boolean column indicating if the user is currently active (1) or not (0). The definition of an active customer is one that is not currently lapsed."

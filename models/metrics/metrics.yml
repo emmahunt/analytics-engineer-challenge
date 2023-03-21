@@ -16,21 +16,6 @@ metrics:
     dimensions:
       - user_cohort_week
 
-  - name: lapsed_users
-    label: Lapsed Users
-    model: ref('dim_user')
-    description: "A user is considered lapsed if they have not generated a page view in 7 days."
-
-    calculation_method: count_distinct
-    expression: user_identifier
-
-    timestamp: lapsed_date
-    time_grains: [day, week, month, quarter, year]
-
-    dimensions:
-      - user_identifier
-      - user_cohort_week
-
 models:
   - name: user_retention
     description: "This model calculates some user retention metrics such as active_users, lapsed_users and retention rate, at a weekly grain and broken down by weekly user sign up cohorts. It is at the grain of one row per week, per user cohort."
