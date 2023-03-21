@@ -37,21 +37,17 @@ models:
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
-            - date_week
             - user_cohort_week
+            - segment
+            - weeks_since_first_active
+            - cohort_size
+
     columns:
-      - name: date_week
-        description: "The date of the start of a week: this is the period for which the metrics will be calculated."
       - name: user_cohort_week
         description: "The date of the start of the week in which the user was created"
       - name: new_users
         description: "Number of new users that were created in the date_week period, in the given cohort group."
-      - name: lapsed_users
-        description: "Number of lapsed users that lapsed in the date_week period, in the given cohort group."
-      - name: active_users
+      - name: number_of_active_users
         description: "The number of active users (had a page view) in the date_week period, in the given cohort group."
-      - name: retained_users
-        description: "Number of non-lapsed users in the date_week period, in the given cohort group."
-      - name: retention_rate
-        description: "The proportion of active users in the given date week period that did not lapse."
+     
   
