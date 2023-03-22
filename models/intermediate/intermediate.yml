@@ -16,20 +16,39 @@ models:
         description: "The user_id from the users table that corresponds to the user_identifier from the page view data set, according to a best attempt at matching based on the timestamp of a page view associated with account creation, and the created_at data in the users table. It is not a certain match, but rather a best guess."
         tests:
           - unique
-    
-  - name: int_lapsed_users
-    description: "This intermediate model determines which users in the page view data are currently lapsed, defined as a period of 7 days without a page view, when there has been at least one page view from that user in the past. This model is currently just relative to the latest page view, so supresses instances where a user may have lapsed in the past, if they have since returned to the site."
+  - name: int_weekly_active_users
+    description: "This model partitions user activity into weekly periods since the user was created, and flags if the user was active in that period. It is a helper model that will be used to generate user retetion models"
+    tests: 
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - user_cohort_week
+            - user_id
+            - segment
+            - weeks_since_first_active
     columns:
-      - name: user_identifier
-        description: "The unique identifier for a user as found in the page views table. This identifier is a 36-character string of alphanumeric characters of UUID / GUID format."
-        tests:
-          - unique
-          - not_null
-      - name: latest_page_view
-        description: "The maximum date for a page view in the data set."
-      - name: lapsed_date
-        description: "The latest date the a user lapsed, if they are currently lapsed. This column will be null if the user is not currently lapsed. This is calculated by projecting the latest page view date 7 days forward, and assessing if that date has passed (in this context, relative to the maximum date we have data for which is 2022-12-14. In a real world scenario, the current date or contextual date for the job run should be used).\n\n
-        
-        The date of the lapse will be the last day the user accessed the site, NOT the 7 day projection beyond their last day of use."
-      - name: is_active
-        description: "A boolean column indicating if the user is currently active (1) or not (0). The definition of an active customer is one that is not currently lapsed."
+      - name: user_cohort_week
+        description: "The starting date of the week in which the user was created (the created_at date): column taken from the user dimension. This will be used as a cohort group in a retention model, so that the activity of users of different creation times can be directly compared."
+      - name: user_id
+        description: "Unique identifier for a user."
+      - name: segment
+        description: "The segment of the user, taken from in the user dimension. Can be either 'PERSONAL' or 'ENTERPRISE'. This column is a dimension / drill down filter of the retention model."
+      - name: weeks_since_first_active
+        description: "The number of weeks since the user was created (the created_at date) in which there was pageview activity by the user. This is calculated by subtracting the page view received_at date from the user created_at date, and then dividing by 7 to get the number of weeks. This column is used as to form the definition of a user 'still being active' in that week."
+      - name: active_during_period
+        description: "A flag column which is set to 1 if the user was active during the week. As this model is formed by grouping up a users' page views, there will be no row for any weeks in which the user was not active, so this column will only have a value of 1."
+      - name: cohort_size
+        description: "This column is a placeholder for unioning and is hard coded to null. It is kept null in this model to ensure that the final retention model can be aggregated at any level and the columns remain additive."
+  - name: int_cohort_sizes
+    tests: 
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - user_cohort_week
+            - segment
+    description: "This model calculates the size of each cohort group (e.g. how many users were created in each week) per segment, and is in the retention model."
+    columns:
+      - name: user_cohort_week
+        description: "The starting date of the week in which the user was created (the created_at date): column taken from the user dimension. This will be used as a cohort group in a retention model, so that the activity of users of different creation times can be directly compared."
+      - name: segment
+        description: "The segment of the user, taken from in the user dimension. Can be either 'PERSONAL' or 'ENTERPRISE'. This column is a dimension / drill down filter of the retention model."
+      - name: cohort_size
+        description: "The count of users in the particular cohort group and segment. Only users that have a non-null user_identifier (e.g. have been joined to the page view dataset) are included in this cohort count for consistency in the data set used in retention analysis."
