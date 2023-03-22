@@ -1,6 +1,4 @@
-
-with page_view as (select * from {{ ref('fact_page_view') }})
-, users as (select * from {{ ref('dim_user') }})
+with users as (select * from {{ ref('dim_user') }})
 
 , cohort_size as (
     select 

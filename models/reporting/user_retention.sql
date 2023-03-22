@@ -1,9 +1,7 @@
-with dim_user as (select * from {{ ref('dim_user') }})
-, page_view as (select * from {{ ref('fact_page_view') }})
-, weekly_activity as (select * from {{ ref('int_weekly_active_users') }})
+with weekly_activity as (select * from {{ ref('int_weekly_active_users') }})
 , cohort_size as (select * from {{ ref('int_cohort_sizes') }})
 
--- Generate a row for each week up
+-- Generate a row for each week
 , weeks_since_first_active_spine as (
     select seq4() as weeks_since_first_active
     from table(generator(rowcount => 8))

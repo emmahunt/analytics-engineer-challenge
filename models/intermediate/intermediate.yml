@@ -43,7 +43,6 @@ models:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
             - user_cohort_week
-            - user_id
             - segment
     description: "This model calculates the size of each cohort group (e.g. how many users were created in each week) per segment, and is in the retention model."
     columns:
