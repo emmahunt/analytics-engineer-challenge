@@ -1,4 +1,4 @@
-This is the dbt project for the Synthesia Analytics Engineer challenge
+This is the dbt project for an Analytics Engineer challenge
 
 # dbt set up instructions
 This repository integrates with [dbt](https://docs.getdbt.com/), which creates directed acyclic graphs (DAGs) of data models based on their dependencies, and can be used to build or update these tables from source.

@@ -1,5 +1,11 @@
 
 version: 2
+sources:
+  - name: countries
+    database: worldwide_address_data
+    schema: address
+    tables:
+      - name: openaddress
 
 models:
   - name: stg_users
@@ -12,18 +18,6 @@ models:
           - not_null
       - name: created_at
         description: "The timestamp at which this user account was created, in the format TIMESTAMP_NTZ(9) (or DATETIME). This is a date and time without timezone information. The range of dates in this column is from 2021-10-21 until 2023-01-26, with some null values present."
-      - name: is_internal
-        description: "A boolean column indicating, presumably, if the user is internal or external to the organisation."
-        tests:
-          - not_null
-      - name: segment
-        description: "A categorisation of the users into either personal or enterprise. The majority of users (>90%) are in the 'personal' segment. The column is formatted in all caps."
-        tests:
-          - not_null
-
-          # This test ensures that if there is a new type of segment, we will be alerted via a "noisy" failure of this test
-          - accepted_values:
-              values: ["PERSONAL", "ENTERPRISE"]
               
   - name: stg_page_views
     description: "The staging model for raw page view data. This model performs some simple data cleansing and column renaming so that all downstream models use a consistently-formatted version of this data, and there is no need for repetition in multiple models."

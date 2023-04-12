@@ -5,7 +5,8 @@ with page_view as (select * from {{ ref('fact_page_view') }})
     select 
         users.user_cohort_week
         , users.user_id
-        , users.segment
+        , users.country
+        , users.age
 
         -- Bucket the data into 'periods' / how many weeks after the user was created
         , cast(
@@ -20,7 +21,7 @@ with page_view as (select * from {{ ref('fact_page_view') }})
         page_view
 
     -- Exclude records we can't map to the users table
-    -- This reduces the dataset we can work with, but is necessary if we want to examine the user segments
+    -- This reduces the dataset we can work with, but is necessary if we want to examine the different user attributes
     inner join users 
         on page_view.user_id = users.user_id
     
@@ -29,7 +30,7 @@ with page_view as (select * from {{ ref('fact_page_view') }})
     where
         cast(datediff(day, users.created_at, page_view.received_at) / 7 as int)
         >= 0
-    group by 1, 2, 3, 4
+    group by 1, 2, 3, 4, 5
 
 )
 

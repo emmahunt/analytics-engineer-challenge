@@ -7,8 +7,8 @@ with stg_users as (select * from {{ ref('stg_users') }})
         stg_users.user_id
         , stg_users.created_at
         , date_trunc(week, stg_users.created_at)::date as user_cohort_week
-        , stg_users.is_internal
-        , stg_users.segment
+        , stg_users.age
+        , stg_users.country_name as country
         , mapping_table.user_identifier
     from stg_users
     left join mapping_table

@@ -23,15 +23,14 @@ models:
           combination_of_columns:
             - user_cohort_week
             - user_id
-            - segment
+            - country
+            - age
             - weeks_since_first_active
     columns:
       - name: user_cohort_week
         description: "The starting date of the week in which the user was created (the created_at date): column taken from the user dimension. This will be used as a cohort group in a retention model, so that the activity of users of different creation times can be directly compared."
       - name: user_id
         description: "Unique identifier for a user."
-      - name: segment
-        description: "The segment of the user, taken from in the user dimension. Can be either 'PERSONAL' or 'ENTERPRISE'. This column is a dimension / drill down filter of the retention model."
       - name: weeks_since_first_active
         description: "The number of weeks since the user was created (the created_at date) in which there was pageview activity by the user. This is calculated by subtracting the page view received_at date from the user created_at date, and then dividing by 7 to get the number of weeks. This column is used as to form the definition of a user 'still being active' in that week."
       - name: active_during_period
@@ -43,12 +42,11 @@ models:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
             - user_cohort_week
-            - segment
-    description: "This model calculates the size of each cohort group (e.g. how many users were created in each week) per segment, and is in the retention model."
+            - country
+            - age
+    description: "This model calculates the size of each cohort group (e.g. how many users were created in each week) per demographic attribute group, and is in the retention model."
     columns:
       - name: user_cohort_week
         description: "The starting date of the week in which the user was created (the created_at date): column taken from the user dimension. This will be used as a cohort group in a retention model, so that the activity of users of different creation times can be directly compared."
-      - name: segment
-        description: "The segment of the user, taken from in the user dimension. Can be either 'PERSONAL' or 'ENTERPRISE'. This column is a dimension / drill down filter of the retention model."
       - name: cohort_size
-        description: "The count of users in the particular cohort group and segment. Only users that have a non-null user_identifier (e.g. have been joined to the page view dataset) are included in this cohort count for consistency in the data set used in retention analysis."
+        description: "The count of users in the particular cohort group and combination of demongraphic attributes. Only users that have a non-null user_identifier (e.g. have been joined to the page view dataset) are included in this cohort count for consistency in the data set used in retention analysis."
