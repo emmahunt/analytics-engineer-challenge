@@ -12,10 +12,6 @@ seeds:
           - not_null
       - name: CREATED_AT
         description: "The timestamp at which this user account was created - there is no time zone information provided in the data."
-      - name: IS_INTERNAL
-        description: "A boolean column indicating, presumably, if the user is internal or external to the organisation."
-      - name: SEGMENT
-        description: "A categorisation of the users into either personal or enterprise."
 
   - name: pages_views
     description: "The raw user, loaded as a csv into a dbt seed."

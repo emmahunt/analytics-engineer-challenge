@@ -10,39 +10,37 @@ with stg_page_views as (select * from {{ ref('stg_page_views') }})
 
         -- These categorisations are demonstrative and would require working with the business / developers to refine
         , case
-            when
-                path like '%account%' or path like '%/MY.ACOOUN%'
-                then 'account management'
-            when path like '%actors%' then 'actors'
-            when path like '%video%' then 'project creation and management'
-            when path like '%vidmeo%' then 'project creation and management'
-            when path like '%library%' then 'project creation and management'
-            when path like '%templates%' then 'project creation and management'
-            when path like '%trash%' then 'project creation and management'
-            when path like '%folder%' then 'project creation and management'
-            when path like '%examples%' then 'onboarding'
-            when path like '%onboarding%' then 'onboarding'
-            when path like '%onboarding%' then 'onboarding'
-            when path like '%missing-subs%' then 'account management'
-            when path like '%sign%' then 'account management'
-            when path like '%sin-in%' then 'account management'
-            when path like '%login%' then 'account management'
-            when path like '%questionnaire%' then 'account management'
-            when path like '%subscription%' then 'account management'
-            when path like '%first-time%' then 'account management'
-            when path like '%password%' then 'account management'
+            when path = '/my_account' then 'account management'
+            when path = '/template' then 'actors'
+            when path = '/presentation' then 'project creation and management'
+            when path = '/presentation' then 'project creation and management'
+            when path = '/folder' then 'project creation and management'
+            when path = '/themes' then 'project creation and management'
+            when path = '/bin' then 'project creation and management'
+            when path = '/folder' then 'project creation and management'
+            when path = '/onboarding' then 'onboarding'
+            when path = '/onboarding' then 'onboarding'
+            when path = '/onboarding' then 'onboarding'
+            when path = '/add_payment_details' then 'account management'
+            when path = '/signup' then 'account management'
+            when path = '/signup' then 'account management'
+            when path = '/login' then 'account management'
+            when path = '/survey' then 'account management'
+            when path = '/subscription' then 'account management'
+            when path = '/welcome' then 'account management'
+            when path = '/password' then 'account management'
             else 'other'
         end as page_category
         
         -- This column captures the order in which steps are expected to be taken when a user signs up for the product
         -- Used for sorting the pages
         , case
-            when path like '%pricing%' then 10
-            when path like '%sign-up%' then 20
-            when path like '%login%' then 20
-            when path like '%missing-subs%' then 30
-            when path like '%first-time-visit%' then 40
-            when path like '%questionnaire%' then 50
+            when path = '%pricing%' then 10
+            when path = '%sign-up%' then 20
+            when path = '%login%' then 20
+            when path = '%missing-subs%' then 30
+            when path = '%first-time-visit%' then 40
+            when path = '%questionnaire%' then 50
         end as sign_up_process_ordinal
     from stg_page_views
 )

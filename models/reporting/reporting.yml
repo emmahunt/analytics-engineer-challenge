@@ -18,12 +18,13 @@ metrics:
 
 models:
   - name: user_retention
-    description: "This model supports visualisation of retention analysis, by providing the cohort weekly activity data in a format that enables calculating the retention rate at any level of filtering by user dimensional attributes (in this case just segment, but this pattern could be expanded to include other attributes of the user). The retention rate can be calculated by summing the active users and dividing by the cohort size: the data is structured with cohort sizes on different rows to the active user values, which means the columns can be safely aggregated over without the denominator in the retention calculation being 'double counted'. This data set supports whole dataset retention analysis and also segmented analysis."
+    description: "This model supports visualisation of retention analysis, by providing the cohort weekly activity data in a format that enables calculating the retention rate at any level of filtering by user dimensional attributes. The retention rate can be calculated by summing the active users and dividing by the cohort size: the data is structured with cohort sizes on different rows to the active user values, which means the columns can be safely aggregated over without the denominator in the retention calculation being 'double counted'. This data set supports whole dataset retention analysis and also segmented analysis."
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
             - user_cohort_week
-            - segment
+            - country
+            - age
             - weeks_since_first_active
             - cohort_size
 
@@ -32,10 +33,8 @@ models:
         description: "The date of the start of the week in which the user was created"
       - name: weeks_since_first_active
         description: "The number of weeks since the user was created (the created_at date) in which there was pageview activity by the user. This is calculated by subtracting the page view received_at date from the user created_at date, and then dividing by 7 to get the number of weeks."
-      - name: segment
-        description: "The segment of the user, taken from in the user dimension. Can be either 'PERSONAL' or 'ENTERPRISE'. This column is a dimension / drill down filter of the retention model."
       - name: number_of_active_users_during_period
-        description: "The number of users who were active for the given weekly period, in the given cohort group and segment. This column is completely additive."
+        description: "The number of users who were active for the given weekly period, in the given cohort group and country and age group. This column is completely additive."
       - name: cohort_size
-        description: "The count of users in the particular cohort group and segment. The same count is repeated for every possible value of weekly period to ensure the retention rate can be calculated."
+        description: "The count of users in the particular cohort group and country and age group. The same count is repeated for every possible value of weekly period to ensure the retention rate can be calculated."
      

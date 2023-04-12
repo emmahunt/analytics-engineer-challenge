@@ -3,7 +3,7 @@ version: 2
 
 models:
   - name: dim_user
-    description: "The user dimension table, which contains all of the descriptive attributes we know about a user. Most of these come from the raw users data, but additionally the user_identifier UUID / GUID which unqiuely identifies a user in the page view data set has been added."
+    description: "The user dimension table, which contains all of the descriptive attributes we know about a user. Most of these are generated randomly."
     columns:
       - name: user_id
         description: "A unique identifier for an inidvidual user, and the primary key for this table."
@@ -12,30 +12,16 @@ models:
           - not_null
       - name: created_at
         description: "The timestamp at which this user account was created, in the format TIMESTAMP_NTZ(9) (or DATETIME)."
-      - name: is_internal
-        description: "A boolean column indicating, presumably, if the user is internal or external to the organisation."
-        tests:
-          - not_null
-      - name: segment
-        description: "A categorisation of the users into either personal or enterprise. The majority of users (>90%) are in the 'personal' segment. The column is formatted in all caps."
-        tests:
-          - not_null
-
-          # This test ensures that if there is a new type of segment, we will be alerted via a "noisy" failure of this test
-          - accepted_values:
-              values: ["PERSONAL", "ENTERPRISE"]
       - name: user_cohort_week
         description: "The week in which the user was created, used for cohort analysis of user retention."
       - name: is_active
         description: "A boolean column flagging if the user is currently active."
-      - name: user_identifier
-        description: "The UUID formatted unique identifier for a user, which is used in the page view data set. This is an inferred match to the user_id based on a timestamp of the user creation and corresponding page view event. It can be used to join the users data set to the page view data set."
               
   - name: fact_page_view
     description: "The transactional fact table containing one row per page view event - an instance of a user accessing a page on the website."
     columns:
       - name: page_view_id
-        description: "The primary key for this table, which uniquely identifies a page view event. This is a hashed surrogate key over a combination of the path, user_identifier and received_at columns. It seems that there are some cases where the same user can access 2 different pages at the exact same time, so the path is required as part of this unique key."
+        description: "The primary key for this table, which uniquely identifies a page view event. This is a hashed surrogate key over a combination of the path, user_id and received_at columns. It seems that there are some cases where the same user can access 2 different pages at the exact same time, so the path is required as part of this unique key."
         tests:
           - unique
           - not_null
@@ -50,10 +36,10 @@ models:
         description: "The timestamp at which this page view was received, presumably by the server, in the format of TIMESTAMP_NTZ(9) (or DATETIME)."
         tests:
           - not_null
-      - name: user_identifier
+      - name: user_id
         description: "The unique identifier for a user, which is a 36-character string of alphanumeric characters. In the current set of data, all non-null user_id values follow the pattern of starting with 'aaaaaaaa-'. There are some null values in this field: about 1% of the records."
       - name: user_id
-        description: "The foreign key to the dim_user dimension. This column can be used to join the pageview fact table to the user dimension table to derive additional descriptive attributes about the user, such as their segment. Given the nature of how this column is populated, it is possible that there are some null values in this column."
+        description: "The foreign key to the dim_user dimension. This column can be used to join the pageview fact table to the user dimension table to derive additional descriptive attributes about the user. Given the nature of how this column is populated, it is possible that there are some null values in this column."
       - name: dwell_time_in_seconds
         description: "The number of seconds between a given page view and the next page view in a session. This column will be null for the last page view in a session. Note that dwell time may not be an measure of active viewership on a page."
         tests:
